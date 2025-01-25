@@ -1,0 +1,20 @@
+{
+    "version": 1,
+    "builds": [
+      {
+        "src": "scraper_project/wsgi.py",
+        "use": "@vercel/python",
+        "config": {
+            "maxLambdaSize": "15mb",
+            "runtime": "python3.9"
+          }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "scraper_project/wsgi.py"
+      }
+    ]
+  }
+  
