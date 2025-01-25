@@ -9,7 +9,8 @@
     <style>
         body {
             font-family: "Rubik", sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
         }
         input:focus {
             border-color: #5CB338 !important;
@@ -19,7 +20,30 @@
             display: none;
         }
         @media print {
-            #scraper-form, #print-button { display: none; }
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            #output-section {
+                display: block !important;
+                margin: 20px;
+            }
+            .table td, .table th {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+            header, footer, #scraper-form {
+                display: none !important;
+            }
+            #print-button {
+                display: none !important;
+            }
+        }
+        #print-button {
+            padding: 0.8rem 4rem;
+            margin: 2rem 3%;
+            background-color: #5CB338;
+            color: azure;
         }
     </style>
 </head>
@@ -45,7 +69,7 @@
             <thead>
                 <tr>
                     <th>Title</th>
-                    <th>Description</th>
+                    <th>Created</th>
                     <th>Keywords</th>
                     <th>Author</th>
                 </tr>
@@ -59,15 +83,25 @@
             <thead>
                 <tr>
                     <th>Headings</th>
-                    <th>Hashtags</th>
                     <th>Links</th>
-                    <th>Paragraphs</th>
+                    <th>Hashtags</th>
                 </tr>
             </thead>
             <tbody id="scraped-data-table"></tbody>
         </table>
 
-        <button id="print-button" class="btn mt-4" onclick="window.print()" style="background-color: #5CB338; color: azure;">Print Data</button>
+        <!-- Paragraph Table -->
+        <h4>Paragraphs</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Paragraph</th>
+                </tr>
+            </thead>
+            <tbody id="paragraphs-table"></tbody>
+        </table>
+
+        <button id="print-button" class="btn mt-4" onclick="window.print()">Print Data</button>
     </div>
 </div>
 
@@ -78,6 +112,7 @@
     const outputSection = document.getElementById("output-section");
     const metadataTable = document.getElementById("metadata-table");
     const scrapedDataTable = document.getElementById("scraped-data-table");
+    const paragraphsTable = document.getElementById("paragraphs-table");
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -98,20 +133,26 @@
             metadataTable.innerHTML = ` 
                 <tr>
                     <td>${data.metadata.title || "No title found"}</td>
-                    <td>${data.metadata.description || "No description found"}</td>
+                    <td>${data.metadata.created || "No created date found"}</td>
                     <td>${data.metadata.keywords || "No keywords found"}</td>
                     <td>${data.metadata.author || "No author found"}</td>
                 </tr>
             `;
 
             // Populate Scraped Data table
-            const maxRows = Math.max(data.headings.length, data.hashtags.length, data.links.length, data.paragraphs.length);
-            scrapedDataTable.innerHTML = Array.from({ length: maxRows }, (_, i) => `
+            const maxRows = Math.max(data.headings.length, data.hashtags.length, data.links.length);
+            scrapedDataTable.innerHTML = Array.from({ length: maxRows }, (_, i) => ` 
                 <tr>
                     <td>${data.headings[i] || ""}</td>
-                    <td>${data.hashtags[i] || ""}</td>
                     <td>${data.links[i] || ""}</td>
-                    <td>${data.paragraphs[i] || ""}</td>
+                    <td>${data.hashtags[i] || ""}</td>
+                </tr>
+            `).join("");
+
+            // Populate Paragraphs table
+            paragraphsTable.innerHTML = data.paragraphs.map((paragraph) => `
+                <tr>
+                    <td>${paragraph}</td>
                 </tr>
             `).join("");
 
